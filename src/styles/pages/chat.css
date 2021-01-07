@@ -1,0 +1,150 @@
+#chatPage{
+    width: 95vw;
+    height: 95vh;
+
+    background-color: white;
+
+    border-radius: 32px;
+}
+#chatPage .chatHeader{
+    width: 100%;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+
+    background-color: var(--secondaryColor);
+    color: white;
+
+    border-radius: 32px 32px 0 0;
+}
+#chatPage .nameStatus{
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    text-decoration: none;
+    color: white;
+}
+#chatPage .name{
+    width: 100%;
+
+    font-size: 24px;
+    font-weight: 700;
+
+    transition: text-shadow 0.2s;
+
+    overflow: hidden;
+    line-height: 24px;
+    max-height: 24px;
+
+}
+#chatPage .nameStatus:hover .name{
+    text-shadow: 0px 0px 2px;
+}
+#chatPage .goBack{
+    font-size: 18px;
+    width: 32px;
+
+    transition: font-size 0.1s;
+
+    cursor: pointer;
+}
+#chatPage .goBack:hover{
+    font-size: 22px;
+}
+
+#chatPage .chatBody{
+    width: 100%;
+    height: calc(100% - 45px - 45px);
+
+    padding: 10px 30px;
+
+    overflow: scroll;
+
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+}
+
+#chatPage .chatFooter{
+    width: 100%;
+    height: 45px;
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 0 20px;
+
+    background-color: var(--secondaryColor);
+    border-radius: 0 0 31px 31px;
+
+
+}
+#chatPage .chatFooter .chatInput{
+    background-color: white;
+    color: var(--secondaryColor);
+
+    width: 100%;
+
+    font-size: 18px;
+
+}
+#chatPage .chatFooter .chatSendButton{
+    background: none;
+    border-style: none;
+    color: white;
+
+    font-size: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+}
+#chatPage .chatFooter .chatSendButton .me{
+    transition: box-shadow 0.3s;
+}
+
+#chatPage .chatFooter .chatSendButton .me:hover{
+    box-shadow: 3px 3px 5px var(--sLighterColor);
+}
+
+/*placeholder*/
+#chatPage ::-webkit-input-placeholder {
+    color: var(--sLighterColor);
+ }
+ 
+ #chatPage :-moz-placeholder { /* Firefox 18- */
+    color: rgb(163, 163, 163); 
+ }
+ 
+ #chatPage ::-moz-placeholder {  /* Firefox 19+ */
+    color:rgb(163, 163, 163);
+ }
+ 
+ #chatPage :-ms-input-placeholder {  
+    color: rgb(163, 163, 163);
+}
+
+@media screen and (max-width: 600px){
+    #chatPage{
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+    #chatPage .name{
+        font-size: 20px;
+    }
+    #chatPage .chatHeader, #chatPage .chatFooter{
+        border-radius: 0;
+        padding: 0 5px;
+    }
+}

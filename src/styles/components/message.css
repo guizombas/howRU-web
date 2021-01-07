@@ -1,0 +1,30 @@
+.message{
+    display: flex;
+    flex-direction: column;
+}
+.messageBaloon{
+    max-width: 70%;
+
+    padding: 7.5px 12.5px;
+    border-radius: 12px;
+
+    color: white;
+
+}
+
+.message.sentByyou{
+    align-items: flex-end;
+}
+.message.sentByyou .messageBaloon{
+    background-color: var(--sLighterColor);
+}
+.message.sentByfriend{
+    align-items: flex-start;
+}
+.message.sentByfriend .messageBaloon{
+    background-color: var(--pDarkerColor);
+}
+
+.message.sentByfriend + .message.sentByyou, .message.sentByyou + .message.sentByfriend{
+    margin-bottom: 10px;
+}

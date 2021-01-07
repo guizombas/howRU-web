@@ -1,0 +1,114 @@
+#loginPage, #registerPage{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+#registerPage form, #loginPage form{
+    width: 300px;
+
+    background-color: white;
+    border-radius: 28px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    position: relative;
+    padding-bottom:20px ;
+
+}
+#loginPage form{
+    height: 300px;
+}
+#registerPage form{
+    height: 300px;
+}
+
+.inputs{
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+#loginPage .inputs{
+    margin-top: 28px;
+}
+#registerPage .inputs{
+    margin-top: 5px;
+}
+input{
+    width: 75%;
+    height: 32px;
+    padding-left: 15px;
+
+    border: none;
+    border-radius: 32px;
+
+    background-color: var(--secondaryColor);
+    color: white;
+
+}
+
+/*placeholder*/
+::-webkit-input-placeholder {
+    color: rgb(163, 163, 163);
+ }
+ 
+:-moz-placeholder { /* Firefox 18- */
+    color: rgb(163, 163, 163); 
+ }
+ 
+::-moz-placeholder {  /* Firefox 19+ */
+    color:rgb(163, 163, 163);
+ }
+ 
+:-ms-input-placeholder {  
+    color: rgb(163, 163, 163);
+}
+
+.fieldName{
+    width: 70%;
+    border-top: 10px;
+}
+
+
+#loginPage button, #registerPage button{
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+
+    border-radius: 0 0 27px 27px;
+    border-style: none;
+
+    height: 36px;
+    background-color: var(--secondaryColor);
+    color: white;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: background-color 0.3s, color 0.3s;
+}
+#loginPage button:hover, #registerPage button:hover{
+    background-color: var(--sLighterColor);
+}
+
+.backArrow{
+    position: absolute;
+    top: 10px;
+    left: 20px;
+
+    font-size: 24px;
+
+    color: var(--secondaryColor);
+
+    transition: font-size 0.5s;
+}
+.backArrow:hover{
+    font-size: 30px;
+}

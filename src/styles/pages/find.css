@@ -1,0 +1,112 @@
+#findPage{
+    background-color: white;
+
+    width: 50vw;
+    max-height: 100vh;
+
+    padding: 25px;
+    border-radius: 32px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#findPage h1{
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#findPage h1 .goBack{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: color 0.3s;
+    cursor: pointer;
+}
+#findPage h1 .goBack:hover{
+    color: var(--sLighterColor);
+}
+
+#findPage #findFriendsForm{
+    margin: 20px 0;
+}
+#findPage fieldset{
+    border-style: none;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#findPage fieldset ~ fieldset{
+    margin-top: 5px;
+}
+
+#findPage fieldset label{
+    font-size: 18px;
+}
+#findPage #findFriendsForm select{
+    border-color: var(--secondaryColor);
+    color: var(--secondaryColor);
+    border-radius: 5px;
+}
+#findPage #findFriendsForm input{
+    width: 100%;
+}
+#findPage #findFriendsForm button{
+    display: flex;
+    
+    padding: 5px;
+
+    font-size: 18px;
+    color: var(--secondaryColor);
+    
+    border-color: var(--secondaryColor);
+    border-radius: 100%;
+
+    transition: border-color 0.3s, color 0.3s;
+}
+#findPage #findFriendsForm button:hover{
+    color: var(--sLighterColor);
+    border-color: var(--sLighterColor);
+}
+
+#findPage .results{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    padding-right: 10px;
+
+    overflow: scroll;
+}
+#findPage .results .notFound{
+    color: rgb(180, 0, 0);
+    text-align: center;
+}
+#findPage .results .friendCard{
+    width: 100%;
+
+    color: white;
+    font-size: 22px;
+    background-color: var(--sLighterColor);
+    text-decoration: none;
+    text-align: center;
+
+    padding: 20px 10px;
+    border-radius: 18px;
+    border: 1px solid var(--sLighterColor);
+
+    transition: background-color 0.3s, color 0.3s;
+}
+#findPage .results .friendCard:hover{
+    background-color: white;
+    color: var(--sLighterColor);
+}
+
+@media screen and (max-width: 700px){
+    #findPage {
+        width: 95vw;
+    }
+}

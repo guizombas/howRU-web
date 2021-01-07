@@ -1,0 +1,217 @@
+#menuPage{
+    width: 90%;
+    height: 95%;
+    border-radius: 32px;
+}
+
+.tabs{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tabs label{
+    height: 50px;
+    width: 50%;
+    background-color: var(--sLighterColor);
+    color: white;
+
+    padding: 10px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+
+    transition: font-size 0.3s;
+
+}
+.tabs label:hover{
+    font-size: 30px;
+}
+.tabs input[type="radio"]{
+    display: none;
+}
+.tabs .tabSelected{
+    background-color: var(--secondaryColor);
+}
+.tabs .tabChats{
+    border-top-left-radius: 31px;
+}
+.tabs .tabFriends{
+    border-top-right-radius: 31px;
+}
+
+.content{
+    width: 100%;
+    height: calc(95% - 50px );
+
+    background-color: white;
+
+    border-bottom-left-radius: 32px  ;
+    border-bottom-right-radius: 32px ;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#chatsDiv, #friendsDiv{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    justify-items: center;
+    gap: 30px;
+    max-width: 1200px;
+
+    padding: 0 30px 30px 0;
+    margin: 30px 0 0 30px;
+
+    max-height: 80vh;
+    overflow: scroll;
+}
+#chatsDiv .chat, #friendsDiv .friend, #friendsDiv .addNewFriend{
+    width: 300px;
+    height: 100px;
+
+    background-color: var(--secondaryColor);
+    color: white;
+
+    padding: 10px;
+
+    text-decoration: none;
+    transition: background-color 0.3s;
+
+    border-radius: 10px;
+
+}
+#chatsDiv .chat:hover, #friendsDiv .addNewFriend:hover{
+    background-color: var(--sLighterColor);
+} 
+#menuPage .name{
+    font-size: 24px;
+    font-weight: bold;
+
+    max-height: 32px;
+    overflow: hidden;
+}
+#chatsDiv .chat .lastMessage{
+    font-size: 18px;
+    max-height: 48px;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+}
+.sentIcon{
+    margin-right: 5px;
+}
+
+#friendsDiv .buttons{
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 10px;
+    text-decoration: none;
+}
+.friendButton{
+    box-sizing: content-box;
+
+    color: white;
+    font-size: 24px;
+
+    padding: 5px;
+    border: 1px solid white;
+    border-radius: 5px;
+
+    transition: color 0.3s, border-color 0.3s;
+
+}
+.friendButton:hover{
+    color: rgb(185, 185, 185);
+    border-color: rgb(185, 185, 185);
+}
+
+#friendsDiv .addNewFriend{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.goToProfile{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+
+    font-size: 36px;
+
+    color: var(--sLighterColor);
+
+    transition: color 0.3s;
+}
+.goToProfile:hover{
+    color: var(--secondaryColor);
+}
+
+
+
+@media screen and (max-width: 1150px){
+    #chatsDiv, #friendsDiv{
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+@media screen and (max-width: 800px){
+    .content{
+        height: calc(95% - 50px - 36px);
+    }
+    #chatsDiv, #friendsDiv{
+        grid-template-columns: 1fr;
+        max-height: 70vh;
+    }
+    .goToProfile{
+        position: static;
+    }
+}
+@media screen and (max-width: 390px){
+    #chatsDiv .chat, #friendsDiv .friend, #friendsDiv .addNewFriend{
+        width: 70vw;
+    }
+    .tabs label{
+        font-size: 20px;
+    }
+    .tabs label:hover{
+        font-size: 22px;
+    }
+}
+@media screen and (max-height: 800px){
+    #chatsDiv, #friendsDiv{
+        max-height: 75vh;
+    }
+}
+@media screen and (max-height: 760px){
+    #chatsDiv, #friendsDiv{
+        max-height: 70vh;
+    }
+}
+@media screen and (max-height: 580px){
+    #chatsDiv, #friendsDiv{
+        max-height: 65vh;
+    }
+}
+@media screen and (max-height: 470px){
+    #chatsDiv, #friendsDiv{
+        max-height: 55vh;
+    }
+}
+@media screen and (max-height: 350px){
+    #chatsDiv, #friendsDiv{
+        max-height: 45vh;
+    }
+}
