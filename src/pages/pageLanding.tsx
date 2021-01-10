@@ -1,3 +1,4 @@
+import React from 'react'
 import {Link} from 'react-router-dom'
 
 import landingImgNoBg from '../images/chatHomePageNoBg.png'
@@ -6,6 +7,7 @@ import '../styles/global.css'
 import '../styles/pages/pageLanding.css'
 
 const PageLanding = () =>{
+    
     return (
         <div id="homePage">
             <img src={landingImgNoBg} alt="imagem de chat"/>
