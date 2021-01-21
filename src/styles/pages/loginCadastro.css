@@ -115,9 +115,11 @@ input{
     font-size: 30px;
 }
 
-#registerPage small{
+.errWarning{
     font-size: 12px;
     width: 70%;
+    color: red;
+    display: none;
 }
 
 @media (max-height: 425px), (max-width: 300px){
