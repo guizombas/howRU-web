@@ -9,6 +9,7 @@ import '../styles/pages/perfil.css'
 interface User{
     name: String,
     id: number,
+    yourID: number,
     tel: String,
     email: String,
     isYourFriend: Boolean, 
@@ -17,14 +18,16 @@ interface User{
 function Perfil(){
     const history = useHistory()
 
-    const yourID = 7; 
+    
     const user:User = {
         name: "Guilherme Gabriel Silva Pereira",
-        id: 7,
+        id: 8,
+        yourID: 7,
         tel: "37998343632",
         email: "guigui@gmail.com",
-        isYourFriend: false
+        isYourFriend: true
     }
+    const yourID = user.yourID; 
 
     const [isFriend, setIsFriend] = useState<Boolean>(user.isYourFriend)
     const [toEdit, setToEdit] = useState(false)
