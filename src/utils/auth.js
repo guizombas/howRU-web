@@ -13,14 +13,18 @@ const isAuthenticated = async () =>{
     return await fetch('http://localhost:3300/auth', reqConfig)
     .then( res =>{
         if (res.status === 200)
-            return true
-        else if (res.status === 203)
+            return res.json()
+    })
+    .then( jsonRes =>{
+        if (jsonRes)
+            return jsonRes.id
+        else
             return false
-    } )
+    })
     .catch( err =>{
         console.log(err);
         alert('Erro no servidor')
-    } )
+    })
 }
 
 export default isAuthenticated

@@ -5,6 +5,7 @@ import {FaPlus, FaUserCircle, FaSignOutAlt} from 'react-icons/fa'
 import {FaComment} from 'react-icons/fa'
 import {FaReply} from 'react-icons/fa'
 
+import '../styles/global.css'
 import '../styles/pages/menu.css'
 
 interface Chat {
@@ -22,7 +23,7 @@ interface Status{
     friends: 'noRequest' | 'processing' | 'done'
 }
 
-const Menu = () =>{
+const Menu = (props:any) =>{
 
     const [tab, setTab] = useState(0)
     const [loadStatus, setLoadStatus] = useState<Status>({
@@ -39,10 +40,8 @@ const Menu = () =>{
         localStorage.clear()
         window.location.href = '/'
     }
-    const yourID = 7
 
-    
-
+    const yourID = props.userId 
     const token = localStorage.getItem('accessToken')
     
     if (!token)
@@ -65,7 +64,6 @@ const Menu = () =>{
         
         fetch( 'http://localhost:3300/allChats', reqConfig )
         .then( res =>{
-            
 
             if (res.status === 400){
                 alert('Erro de autenticação')
@@ -147,7 +145,7 @@ const Menu = () =>{
     return (
         <div id="menuPage">
             
-            <Link to={"/perfil/ID="+yourID} className="goToProfile"><FaUserCircle></FaUserCircle></Link>
+            <Link to={"/perfil/"+yourID} className="goToProfile"><FaUserCircle></FaUserCircle></Link>
             <div onClick={handleSignOutClick} className="signOut"><FaSignOutAlt></FaSignOutAlt></div>
             
             <div className="tabs">
@@ -240,7 +238,7 @@ const Menu = () =>{
                                         {friend.name}
                                     </div>
                                     <div className="buttons">
-                                        <Link to={`/perfil/ID=${friend.id}`}>
+                                        <Link to={`/perfil/${friend.id}`}>
                                             <FaUserCircle className="friendButton"></FaUserCircle>
                                         </Link>
                                         <Link to={`/chat/yID=${yourID}/fID=${friend.id}`}>

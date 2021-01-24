@@ -14,21 +14,51 @@ const Find = () => {
 
     const [results, setResults] = useState<Array<Results>>()
     const [searchMade, setSearchMade] = useState(false)
-    
 
     const handleSearchFormSubmit = (event:FormEvent) =>{
         event.preventDefault()
 
-        setSearchMade(true)
-        setResults([{
-            id: 7,
-            name: "Guilherme Gabriel Silva Pereira"
-        },
-        {
-            id: 99,
-            name:"Carlos Drummond de Andrade"
+        const typeOfSearch:any = document.getElementsByName('typeOfSearch')[0]
+        const text:any = document.getElementsByName('text')[0]
+        
+        const token = localStorage.getItem('accessToken')
+
+        const reqConfig:RequestInit = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': token || ''
+            }
         }
-    ])
+
+        fetch(`http://localhost:3300/searchUser/${text.value}/${typeOfSearch.value}`, reqConfig)
+        .then( res =>{
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                return window.location.href = '/'
+            }
+            if (res.status === 200)
+                return res.json()
+
+        })
+        .then( (jsonRes:Results[]) =>{
+            if (jsonRes){
+                setResults(jsonRes.map( (user:Results) =>{
+                    return {
+                        id: user.id,
+                        name: user.name
+                    }
+                }))
+            }
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+            
+        })
+
+        setSearchMade(true)
 
     }
 
@@ -54,7 +84,7 @@ const Find = () => {
                 </fieldset>
                 
                 <fieldset>
-                    <input type="text" placeholder="Busca"/>
+                    <input name="text" type="text" placeholder="Busca"/>
                     <button type="submit">
                         <FaSearch></FaSearch>
                     </button>
@@ -66,13 +96,13 @@ const Find = () => {
                 {
                     searchMade
                     ?
-                        results
+                        results && results.length > 0
                         ?
                         results.map( result => {
                             return(
                                 <Link 
                                     key={result.id}
-                                    to={"/perfil/id:"+result.id}
+                                    to={"/perfil/"+result.id}
                                     className="friendCard"
                                 >{result.name}</Link>
                             )

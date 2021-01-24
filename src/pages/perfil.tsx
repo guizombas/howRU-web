@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react'
-import {Link, useHistory} from 'react-router-dom'
+import { Link, useHistory, useParams} from 'react-router-dom'
 
 import {FaLongArrowAltLeft, FaEdit, FaPlus, FaComment} from 'react-icons/fa'
 
@@ -7,37 +7,65 @@ import '../styles/global.css'
 import '../styles/pages/perfil.css'
 
 interface User{
-    name: String,
-    id: number,
-    yourID: number,
-    tel: String,
-    email: String,
-    isYourFriend: Boolean, 
+    name?: String,
+    id: string | undefined,
+    yourID: string|undefined,
+    tel?: String,
+    email?: String,
+    isYourFriend?: Boolean, 
+}
+interface Props{
+    id: string | undefined
 }
 
-function Perfil(){
+function Perfil( props:any ){
     const history = useHistory()
-
+    const params = useParams<Props>()
     
+    const [isFriend, setIsFriend] = useState<Boolean>()
+    const [toEdit, setToEdit] = useState(false)
+    const [name, setName] = useState<String|undefined>("")
+    const [tel, setTel] = useState<String|undefined>("")
+    const [email, setEmail] = useState<String|undefined>("")
+    const [loadStatus, setLoadStatus] = useState('noRequest')
+
     const user:User = {
-        name: "Guilherme Gabriel Silva Pereira",
-        id: 8,
-        yourID: 7,
-        tel: "37998343632",
-        email: "guigui@gmail.com",
-        isYourFriend: true
+        id: params.id,
+        yourID: props.userId
     }
     const yourID = user.yourID; 
 
-    const [isFriend, setIsFriend] = useState<Boolean>(user.isYourFriend)
-    const [toEdit, setToEdit] = useState(false)
-    const [name, setName] = useState(user.name)
-    const [tel, setTel] = useState(user.tel)
-
-
     const handleAddFriendClick = () =>{
         //código de adicionar como amigo
-        user.isYourFriend = true
+        const data = {
+            newFriendID: user.id
+        }
+        
+        const reqConfig:RequestInit = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': token || ''
+            },
+            body: JSON.stringify(data)
+
+        }
+
+        fetch('http://localhost:3300/addFriend', reqConfig)
+        .then( res =>{
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                return window.location.href = '/'
+            }
+
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+            
+        })
+
         setIsFriend(true)
     }
     const handleChangeFormSubmit = (event:FormEvent) =>{
@@ -50,7 +78,83 @@ function Perfil(){
         setName(name.value);
         setTel(tel.value);
 
+        const data = {
+            tel: tel.value,
+            name: name.value
+        }
+        
+        const reqConfig:RequestInit = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': token || ''
+            },
+            body: JSON.stringify(data)
+
+        }
+
+        fetch('http://localhost:3300/updateData', reqConfig)
+        .then( res =>{
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                return window.location.href = '/'
+            }
+
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+            
+        })
+
         setToEdit(false)
+
+    }
+
+    const token = localStorage.getItem('accessToken')
+    if (!token)
+        window.location.href = '/'
+
+    const reqConfig:RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': token || ''
+        }
+    }
+
+    if ( loadStatus === 'noRequest' ){
+
+        setLoadStatus('processing')
+        
+        fetch( 'http://localhost:3300/profile/'+params.id, reqConfig )
+        .then( res =>{
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                return window.location.href = '/'
+            }
+            if (res.status === 404)
+                window.location.href = '/404'
+            
+            return res.json()
+            
+        })
+        .then( (jsonRes:User) =>{
+            
+            setIsFriend(jsonRes.isYourFriend)
+            setName(jsonRes.name)
+            setTel(jsonRes.tel || '')
+            setEmail(jsonRes.email)
+
+            setLoadStatus('done')
+            
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+        })
 
     }
     
@@ -85,7 +189,7 @@ function Perfil(){
                     
                     <div className="info email">
                         <p>E-mail:</p>
-                        <h3>{user.email}</h3>
+                        <h3>{email}</h3>
                     </div>
                     {
                         yourID===user.id
@@ -106,6 +210,7 @@ function Perfil(){
                                 type="text"
                                 defaultValue={ `${name}`}
                                 autoComplete="off"
+                                required
                             />
                         </fieldset>
                         <fieldset>

@@ -5,7 +5,8 @@ import isAuthenticated from '../utils/auth'
 
 interface Auth{
     ready: boolean,
-    res: boolean | void
+    res: boolean | void,
+    userId: string | boolean
 }
 
 const AuthRoute = ( params:any ) =>{
@@ -13,20 +14,22 @@ const AuthRoute = ( params:any ) =>{
     const {component: Component, needAuth , ...rest} = params
     const [ auth, setAuth ] = useState<Auth>({
         ready: false,
-        res: false
+        res: false,
+        userId: ''
     })
 
     return <Route {...rest}  render={ (props:any)=>{
         
         if (!auth.ready){
             isAuthenticated()
-            .then( (res:boolean|void) =>{
+            .then( (res:boolean|void|string) =>{
                 
                 setAuth({
                     ready: true,
-                    res: res
+                    res: res !== false,
+                    userId: res || ''
                 }) 
-                
+
             }) 
             .catch( err => console.log(err) )
         }
@@ -39,7 +42,7 @@ const AuthRoute = ( params:any ) =>{
         
         ( auth.res === needAuth )
         ?
-        <Component {...props}/>
+        <Component {...props} userId={auth.userId.toString()}/>
         :
         <Redirect  to={ needAuth ? '/' : '/menu' }/>
         
