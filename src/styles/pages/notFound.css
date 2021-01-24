@@ -1,0 +1,25 @@
+#page404{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    background-color: white;
+    border-radius: 100px;
+    padding: 20px 40px;
+
+    position: relative;
+}
+
+#page404 img{
+    max-width: 180px;
+}
+#page404 h1{
+    text-align: center;
+}
+
+#page404 .toHomePage{
+    position: absolute;
+    bottom: -20px;
+}

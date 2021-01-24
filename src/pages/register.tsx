@@ -62,7 +62,10 @@ const Register = () => {
         })
         .then( jsonRes=>{
             if (jsonRes){
-                //fazer controle de sessão
+                //Controle de sessão
+                const token = jsonRes.token
+                localStorage.setItem('accessToken', token)
+
                 window.location.href = "/menu"
             }
         })

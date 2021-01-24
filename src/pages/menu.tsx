@@ -1,7 +1,7 @@
 import {ChangeEvent, useState} from 'react'
 import {Link} from 'react-router-dom'
 
-import {FaPlus, FaUserCircle} from 'react-icons/fa'
+import {FaPlus, FaUserCircle, FaSignOutAlt} from 'react-icons/fa'
 import {FaComment} from 'react-icons/fa'
 import {FaReply} from 'react-icons/fa'
 
@@ -17,80 +17,139 @@ interface Friend {
     name: String,
     id: number
 }
+interface Status{
+    chats: 'noRequest' | 'processing' | 'done',
+    friends: 'noRequest' | 'processing' | 'done'
+}
 
 const Menu = () =>{
 
     const [tab, setTab] = useState(0)
+    const [loadStatus, setLoadStatus] = useState<Status>({
+        chats: 'noRequest',
+        friends: 'noRequest'
+    })
+    const [chats, setChats] = useState([])
+    const [friends, setFriends] = useState([])
 
-    const handleRadioTabChange = async (event: ChangeEvent<HTMLInputElement>) =>{
+    const handleRadioTabChange = (event: ChangeEvent<HTMLInputElement>) =>{
         setTab(parseInt(event.target.value))
     }
-
+    const handleSignOutClick = () => {
+        localStorage.clear()
+        window.location.href = '/'
+    }
     const yourID = 7
-    const chats:Array<Chat> = [
-        {
-            name: "Roger Machado",
-            lastMessage: "Se fuder irmão",
-            lastSender: "you",
-            friendID: 3
-        },
-        {
-            name: "Michele Obama",
-            lastMessage: "Compra um trem pra mim quando for",
-            lastSender: "friend",
-            friendID: 1
-        },
-        {
-            name: "Cazalbé de Nóbrega",
-            lastMessage: "Sem graça",
-            lastSender: "friend",
-            friendID: 5
-        },
-        {
-            name: "Edinho da Lapa",
-            lastMessage: "Ignorante",
-            lastSender: "you",
-            friendID: 11
-        },
-        {
-            name: "Fernando de Noronha",
-            lastMessage: "Queria só te falar que você nunca vai me conhecer kkkkkkk",
-            lastSender: "friend",
-            friendID: 55
-        },
-    ];
-    const friends:Array<Friend> = [
-        {
-            id:5,
-            name:"Cazalbé de Nóbrega"
-        },
-        {
-            id:2,
-            name: "Cleiton da Navalha"
-        },
-        {
-            id:11,
-            name:"Edinho da Lapa"
-        },
-        {
-            id:55,
-            name:"Fernando de Noronha"
-        },
-        {
-            id:1,
-            name:"Michele Obama"
-        },
-        {
-            id:3,
-            name: "Roger Machado"
+
+    
+
+    const token = localStorage.getItem('accessToken')
+    
+    if (!token)
+        window.location.href = '/'
+
+    const reqConfig:RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': token || ''
         }
-    ]
+    }
+
+    if ( loadStatus.chats === 'noRequest' ){
+
+        setLoadStatus({
+            chats: 'processing',
+            friends: loadStatus.friends
+        })
+        
+        fetch( 'http://localhost:3300/allChats', reqConfig )
+        .then( res =>{
+            
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                return window.location.href = '/'
+            }
+            
+            return res.json()
+            
+        })
+        .then( jsonRes =>{
+            
+            setChats(jsonRes.map( (chat:Chat) =>{
+                return{
+                    friendID: chat.friendID,
+                    lastMessage: chat.lastMessage,
+                    lastSender: chat.lastSender,
+                    name: chat.name
+                }
+            }))
+
+            setLoadStatus({
+                chats: 'done',
+                friends: loadStatus.friends
+            })
+            
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+        })
+
+    }
+
+    if ( loadStatus.friends === 'noRequest' ){
+
+        setLoadStatus({
+            chats: loadStatus.chats,
+            friends: 'processing'
+        })
+        
+        fetch( 'http://localhost:3300/allFriends', reqConfig )
+        .then( res =>{
+            
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                return window.location.href = '/'
+            }
+            
+            return res.json()
+            
+        })
+        .then( jsonRes =>{
+            
+            setFriends(jsonRes.map( (friend:Friend) =>{
+                return{
+                    id: friend.id,
+                    name: friend.name
+                }
+            }))
+
+            setLoadStatus({
+                chats: loadStatus.chats,
+                friends: 'done'
+            })
+            
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+        })
+
+
+    }
+
+
 
 
     return (
         <div id="menuPage">
-            <Link to={"/perfil/ID="+yourID}><FaUserCircle className="goToProfile"></FaUserCircle></Link>
-
+            
+            <Link to={"/perfil/ID="+yourID} className="goToProfile"><FaUserCircle></FaUserCircle></Link>
+            <div onClick={handleSignOutClick} className="signOut"><FaSignOutAlt></FaSignOutAlt></div>
+            
             <div className="tabs">
                 <input 
                     type="radio" 
@@ -123,6 +182,12 @@ const Menu = () =>{
                 <div id="chatsDiv">
 
                     {
+
+                        loadStatus.chats !== 'done'
+                        ?
+                        <div>Loading</div>
+                        :
+
                         chats.length>0
                         ?
                         chats.map( (chat:Chat) =>{
@@ -157,6 +222,12 @@ const Menu = () =>{
                 <div id="friendsDiv">
 
                     {
+
+                        loadStatus.friends !== 'done'
+                        ?
+                        <div>Loading</div>
+                        :
+
                         friends.length>0
                         ?
                         friends.map( (friend:Friend) =>{
@@ -182,7 +253,7 @@ const Menu = () =>{
                         
                         :
 
-                        <div className="noChats">Você ainda não tem nenhuma conversa</div>
+                        <div className="noChats">Você ainda não tem nenhum amigo adicionado</div>
 
                     }
 

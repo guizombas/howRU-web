@@ -53,10 +53,13 @@ const Login = () => {
             div.style.display = 'block'
 
         } )
-        .then( res =>{
+        .then( jsonRes =>{
 
-            if (res){
+            if (jsonRes){
                 //controle de sessão
+                const token = jsonRes.token
+                localStorage.setItem('accessToken', token)
+
                 window.location.href = '/menu'
             }
 

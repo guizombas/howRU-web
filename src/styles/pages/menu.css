@@ -47,7 +47,7 @@
 
 .content{
     width: 100%;
-    height: calc(95% - 50px );
+    height: calc(95% - 25px);
 
     background-color: white;
 
@@ -103,7 +103,7 @@
     overflow: hidden;
 
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 }
 .sentIcon{
     margin-right: 5px;
@@ -144,11 +144,9 @@
     font-size: 20px;
     font-weight: 700;
 }
-
-.goToProfile{
+.goToProfile, .signOut{
     position: absolute;
     top: 5px;
-    left: 5px;
 
     font-size: 36px;
 
@@ -156,8 +154,16 @@
 
     transition: color 0.3s;
 }
-.goToProfile:hover{
+.goToProfile:hover, .signOut:hover{
     color: var(--secondaryColor);
+}
+.goToProfile{
+    left: 5px;
+}
+.signOut{
+    display: inline;
+    right: 5px;
+    cursor: pointer;
 }
 
 
@@ -168,16 +174,19 @@
     }
 }
 @media screen and (max-width: 800px){
+    .tabs{
+        margin-top: 36px;
+    }
     .content{
-        height: calc(95% - 50px - 36px);
+        height: calc(95% - 25px - 36px);
     }
     #chatsDiv, #friendsDiv{
         grid-template-columns: 1fr;
         max-height: 70vh;
-    }
-    .goToProfile{
+    }/*
+    .goToProfile, .signOut{
         position: static;
-    }
+    }*/
 }
 @media screen and (max-width: 390px){
     #chatsDiv .chat, #friendsDiv .friend, #friendsDiv .addNewFriend{
@@ -211,6 +220,9 @@
     }
 }
 @media screen and (max-height: 350px){
+    .content{
+        height: calc(95% - 50px - 36px);
+    }
     #chatsDiv, #friendsDiv{
         max-height: 45vh;
     }
