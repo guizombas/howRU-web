@@ -10,7 +10,7 @@ const isAuthenticated = async () =>{
         },
     }
 
-    return await fetch('http://localhost:3300/auth', reqConfig)
+    return await fetch(process.env.REACT_APP_BACKEND_IP+'/auth', reqConfig)
     .then( res =>{
         if (res.status === 200)
             return res.json()

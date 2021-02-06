@@ -62,7 +62,7 @@ const Menu = (props:any) =>{
             friends: loadStatus.friends
         })
         
-        fetch( 'http://localhost:3300/allChats', reqConfig )
+        fetch( process.env.REACT_APP_BACKEND_IP+'/allChats', reqConfig )
         .then( res =>{
 
             if (res.status === 400){
@@ -183,7 +183,14 @@ const Menu = (props:any) =>{
 
                         loadStatus.chats !== 'done'
                         ?
-                        <div>Loading</div>
+                        <svg className='loading' height='100%' width='100%'>
+                            <circle
+                                className='path' 
+                                cx='50%' cy='50%' r='25' 
+                                stroke='#07354b' strokeWidth='3' 
+                                fill='transparent'
+                            ></circle>
+                        </svg>
                         :
 
                         chats.length>0
@@ -192,7 +199,7 @@ const Menu = (props:any) =>{
                             return (
                                 <Link 
                                     key={chat.friendID} 
-                                    to={`/chat/yID=${yourID}/fID=${chat.friendID}`}
+                                    to={`/chat/${chat.friendID}`}
                                     className="chat"
                                 >
                                     <div className="name">
@@ -223,7 +230,14 @@ const Menu = (props:any) =>{
 
                         loadStatus.friends !== 'done'
                         ?
-                        <div>Loading</div>
+                        <svg className='loading' height='100%' width='100%'>
+                            <circle
+                                className='path' 
+                                cx='50%' cy='50%' r='25' 
+                                stroke='#07354b' strokeWidth='3' 
+                                fill='transparent'
+                            ></circle>
+                        </svg>
                         :
 
                         friends.length>0
@@ -241,7 +255,7 @@ const Menu = (props:any) =>{
                                         <Link to={`/perfil/${friend.id}`}>
                                             <FaUserCircle className="friendButton"></FaUserCircle>
                                         </Link>
-                                        <Link to={`/chat/yID=${yourID}/fID=${friend.id}`}>
+                                        <Link to={`/chat/${friend.id}`}>
                                             <FaComment className="friendButton"></FaComment>
                                         </Link>
                                     </div>

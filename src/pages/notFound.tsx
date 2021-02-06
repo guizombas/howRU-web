@@ -3,6 +3,7 @@ import '../styles/pages/notFound.css'
 import imageCrow from '../images/corvo.gif'
 
 const NotFound = () =>{
+    
     return (
         <div id="page404">
             <h1>Página não encontrada</h1>

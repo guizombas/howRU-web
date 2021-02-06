@@ -17,12 +17,14 @@
 }
 .message.sentByyou .messageBaloon{
     background-color: var(--sLighterColor);
+    border-bottom-right-radius: 0;
 }
 .message.sentByfriend{
     align-items: flex-start;
 }
 .message.sentByfriend .messageBaloon{
     background-color: var(--pDarkerColor);
+    border-bottom-left-radius: 0;
 }
 
 .message.sentByfriend + .message.sentByyou, .message.sentByyou + .message.sentByfriend{

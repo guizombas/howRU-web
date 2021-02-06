@@ -31,7 +31,7 @@ const Find = () => {
             }
         }
 
-        fetch(`http://localhost:3300/searchUser/${text.value}/${typeOfSearch.value}`, reqConfig)
+        fetch(`${process.env.REACT_APP_BACKEND_IP}/searchUser/${text.value}/${typeOfSearch.value}`, reqConfig)
         .then( res =>{
 
             if (res.status === 400){
@@ -108,9 +108,20 @@ const Find = () => {
                             )
                         } )
                         :
+                        results
+                        ?
                         <div className="notFound">
                             Não foram encontrados resultados para a busca
                         </div>
+                        :
+                        <svg className='loading' height='100%' width='100%'>
+                            <circle
+                                className='path' 
+                                cx='50%' cy='50%' r='25' 
+                                stroke='#07354b' strokeWidth='3' 
+                                fill='transparent'
+                            ></circle>
+                        </svg>
                     :
                     ""
                 }

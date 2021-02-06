@@ -50,7 +50,7 @@ const Register = () => {
 
         }
             
-        fetch( 'http://localhost:3300/register', reqConfig )
+        fetch( process.env.REACT_APP_BACKEND_IP+'/register', reqConfig )
         .then( res =>{
             
             if (res.status === 201)

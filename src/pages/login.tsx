@@ -39,7 +39,7 @@ const Login = () => {
 
         }
 
-        fetch( 'http://localhost:3300/login', reqConfig )
+        fetch( process.env.REACT_APP_BACKEND_IP+'/login', reqConfig )
         .then( res =>{
 
             if (res.status === 200)

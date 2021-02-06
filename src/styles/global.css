@@ -37,3 +37,17 @@ body{
 ::-webkit-scrollbar-thumb:hover{
     background-color: var(--secondaryColor);
 }
+
+/*loading*/
+svg .path{
+    stroke-dasharray: 78.5 78.5;
+    animation: loading-roll 1s linear infinite forwards;
+}
+@keyframes loading-roll{
+    0%{
+        stroke-dashoffset: 0;
+    }
+    100%{
+        stroke-dashoffset: -157;
+    }
+}

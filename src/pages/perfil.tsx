@@ -12,7 +12,7 @@ interface User{
     yourID: string|undefined,
     tel?: String,
     email?: String,
-    isYourFriend?: Boolean, 
+    isYourFriend?: Boolean,
 }
 interface Props{
     id: string | undefined
@@ -51,7 +51,7 @@ function Perfil( props:any ){
 
         }
 
-        fetch('http://localhost:3300/addFriend', reqConfig)
+        fetch(process.env.REACT_APP_BACKEND_IP+'/addFriend', reqConfig)
         .then( res =>{
 
             if (res.status === 400){
@@ -93,7 +93,7 @@ function Perfil( props:any ){
 
         }
 
-        fetch('http://localhost:3300/updateData', reqConfig)
+        fetch(process.env.REACT_APP_BACKEND_IP+'/updateData', reqConfig)
         .then( res =>{
 
             if (res.status === 400){
@@ -128,7 +128,7 @@ function Perfil( props:any ){
 
         setLoadStatus('processing')
         
-        fetch( 'http://localhost:3300/profile/'+params.id, reqConfig )
+        fetch( process.env.REACT_APP_BACKEND_IP+'/profile/'+params.id, reqConfig )
         .then( res =>{
 
             if (res.status === 400){
@@ -165,6 +165,17 @@ function Perfil( props:any ){
                 <FaLongArrowAltLeft></FaLongArrowAltLeft>
             </div>
             {
+                loadStatus === 'processing'
+                ?
+                <svg className='loading' height='100%' width='100%'>
+                    <circle
+                        className='path' 
+                        cx='50%' cy='50%' r='25' 
+                        stroke='#07354b' strokeWidth='3' 
+                        fill='transparent'
+                    ></circle>
+                </svg>
+                :
                 !toEdit
                 ?
                 <div className="dados">
@@ -241,7 +252,11 @@ function Perfil( props:any ){
             
             <div className="buttons">
 
-                {
+                {   
+                    loadStatus === 'processing'
+                    ?
+                    ""
+                    :
                     user.id===yourID
                     ?
                     !toEdit
@@ -258,7 +273,7 @@ function Perfil( props:any ){
                     isFriend
                     ?
                     <Link 
-                        to={`/chat/yID=${yourID}/fID=${user.id}`}
+                        to={`/chat/${user.id}`}
                         className="button"
                     >
                         Enviar Mensagem {<FaComment></FaComment>}

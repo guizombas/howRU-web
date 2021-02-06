@@ -1,5 +1,6 @@
 import {FormEvent, useState} from 'react'
 import {Link, useHistory, useParams} from 'react-router-dom'
+import {Socket} from 'socket.io-client'
 
 import { FaLongArrowAltLeft, FaPaperPlane } from 'react-icons/fa'
 
@@ -9,7 +10,6 @@ import '../styles/pages/chat.css'
 
 
 interface Params{
-    yid: string,
     fid: string
 }
 interface MessageType{
@@ -17,93 +17,146 @@ interface MessageType{
     text: string,
     sender: string
 }
+interface Friend{
+    name: string,
+    status: string,
+    id: number
+}
+interface Props{
+    userId: number,
+    socket: Socket
+}
 
-function Chat(){
+function Chat(props:Props){
     const history = useHistory()
     const params = useParams<Params>()
 
-    const friend = {
-        name: "Fulano da Silva Pereira Rodrigues",
-        status: "Offline",
-        id: params.fid
-    }
+    const fId = params.fid
+    const socket = props.socket
+    
 
-    const allMessages = [
-        {
-            id: 1,
-            text: "Falou então mano",
-            sender: "friend"
-        },
-        {
-            id: 11,
-            text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur, odio.",
-            sender: "you"
-        },
-        {
-            id: 2,
-            text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur, odio. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Reprehenderit facere animi beatae voluptas. Expedita qui, voluptatem veniam, ut sequi, cum excepturi delectus eius non commodi illum dolorum ab assumenda quis ducimus nulla sit impedit! Quae, est ullam asperiores quo, esse nisi expedita rerum placeat recusandae tenetur architecto, excepturi assumenda. Atque.",
-            sender: "you"
-        },
-        {
-            id: 3,
-            text: "Lorem ipsum dolor sit amet consectetur adipisicing elit.quatur, odio.",
-            sender: "friend"
-        },
-        {
-            id: 4,
-            text: "Lorem ipsum dolor sing elit. Consequatur, odio.",
-            sender: "you"
-        },
-        {
-            id: 5,
-            text: "Lorem ipsum dolor sit amet consectetur adipisicing elit odio.",
-            sender: "friend"
-        },
-        {
-            id: 6,
-            text: "it amet consectetur adipisicing elit. Consequatur, odio.",
-            sender: "friend"
-        },
-        {
-            id: 7,
-            text: "Lorem ipsum dolor sit amet consectetur adipisicing uatur, odio.",
-            sender: "you"
-        },
-        {
-            id: 8,
-            text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur, odio.",
-            sender: "you"
-        },
-        {
-            id: 9,
-            text: "coe",
-            sender: "friend"
-        },
-        {
-            id: 10,
-            text: "coe menor",
-            sender: "you"
-        },
-    ]
-
-    const [messages, setMessages] = useState(allMessages)
-
-    console.log("arrozDoce")
+    const [messages, setMessages] = useState<Array<MessageType>>([])
+    const [friend, setFriend] = useState<Friend>({
+        id: +fId,
+        name: '...',
+        status: ''
+    })
+    const [loadStatus, setLoadStatus] = useState('noRequest')
+    const [sendingMessage, setSendingMessage] = useState(false)
 
     const handleMessageSubmit = (event: FormEvent) =>{
         event.preventDefault()
 
         let previousMessages = messages.map( message => message ) // clonando array
         let newMessageDiv:any = document.getElementById('chatInput');
-        const newMessage:MessageType = {
-            id: 56,
+
+        if (newMessageDiv.value.trim().length === 0 )
+            return false
+
+        const token = localStorage.getItem('accessToken')
+
+        const data = {
             text: newMessageDiv.value,
-            sender: "you"
+            idReceiver: friend.id
         }
         newMessageDiv.value = ""
-        
-        previousMessages.unshift(newMessage)
+        const reqConfig:RequestInit = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': token || ''
+            },
+            body: JSON.stringify(data)
+        }
+        socket.emit("newMessage", data.text, fId)
+/*
+        fetch(`${process.env.REACT_APP_BACKEND_IP}/newMessage`, reqConfig)
+        .then( res =>{
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                window.location.href = '/'
+            }
+            else if (res.status === 201){
+
+                const newMessage:MessageType = {
+                    id: new Date().getTime(),
+                    text: data.text,
+                    sender: "you"
+                }
+                previousMessages.unshift(newMessage)
+                setMessages(previousMessages)
+                setSendingMessage(false)
+
+            }
+
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+            
+        })
+*/
+        setSendingMessage(true)
+
+    }
+
+    const token = localStorage.getItem('accessToken')
+    if (!token)
+        window.location.href = '/'
+
+    const reqConfig:RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': token || ''
+        }
+    }
+
+    socket.on('receivedMessage', (brandNewMessage: MessageType)=>{
+        let previousMessages = messages.map( message => message ) // clonando array
+        previousMessages.unshift(brandNewMessage)
         setMessages(previousMessages)
+        if (brandNewMessage.sender === 'you')
+            setSendingMessage(false)
+    })
+
+    if ( loadStatus === 'noRequest' ){
+
+        setLoadStatus('processing')
+        
+        fetch( process.env.REACT_APP_BACKEND_IP+'/allMessages/'+fId, reqConfig )
+        .then( res =>{
+
+            if (res.status === 400){
+                alert('Erro de autenticação')
+                window.location.href = '/'
+            }
+            else if (res.status === 404)
+                window.location.href = '/404'
+            else
+                return res.json()
+            
+        })
+        .then( (jsonRes) =>{
+            
+            if (jsonRes){
+                const [name, messages] = jsonRes
+                setFriend({
+                    id: friend.id,
+                    name: name,
+                    status: 'offline'
+                })
+                setMessages(messages)
+            }
+           
+            setLoadStatus('done')
+            
+        })
+        .catch( err =>{
+            console.log(err);
+            alert('Erro no servidor')
+        })
 
     }
 
@@ -112,14 +165,34 @@ function Chat(){
 
             <div className="chatHeader">
                 <FaLongArrowAltLeft className="goBack" onClick={ () => history.goBack() }></FaLongArrowAltLeft>
-                <Link to={"/perfil/ID="+friend.id} className="nameStatus">
+                <Link to={"/perfil/"+friend.id} className="nameStatus">
                     <div className="name">{friend.name}</div>
                     <div className="status">{friend.status}</div>
                 </Link>
             </div>
 
             <div className="chatBody">
+
                 {
+                sendingMessage
+                ?
+                <div>Enviando</div>
+                :
+                ''
+                }
+
+                {
+                loadStatus !== 'done'
+                ?
+                <svg className='loading' height='100%' width='100%'>
+                    <circle
+                        className='path' 
+                        cx='50%' cy='50%' r='25' 
+                        stroke='#07354b' strokeWidth='3' 
+                        fill='transparent'
+                    ></circle>
+                </svg>
+                :
                     messages.map( message =>{
                         return(
                             <Message
@@ -130,6 +203,7 @@ function Chat(){
                         )
                     } )
                 }
+
             </div>
 
             <form className="chatFooter" onSubmit={handleMessageSubmit}>
