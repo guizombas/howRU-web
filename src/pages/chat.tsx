@@ -8,7 +8,9 @@ import Message from '../components/message'
 
 import '../styles/pages/chat.css'
 
-
+interface SocketType extends Socket{
+    removeAllListeners: Function
+} 
 interface Params{
     fid: string
 }
@@ -24,17 +26,21 @@ interface Friend{
 }
 interface Props{
     userId: number,
-    socket: Socket
+    socket: SocketType
 }
+
+let typing = false
 
 function Chat(props:Props){
     const history = useHistory()
     const params = useParams<Params>()
 
+    //variáveis simples
     const fId = params.fid
+    const yId = props.userId
     const socket = props.socket
-    
 
+    //states
     const [messages, setMessages] = useState<Array<MessageType>>([])
     const [friend, setFriend] = useState<Friend>({
         id: +fId,
@@ -44,62 +50,71 @@ function Chat(props:Props){
     const [loadStatus, setLoadStatus] = useState('noRequest')
     const [sendingMessage, setSendingMessage] = useState(false)
 
+    //handlers
+    const handleReceivedMessage = (brandNewMessage: MessageType, senderId:number, receiverId:number) =>{
+
+        //conferindo se a mensagem deve ir para esse chat
+        if ( (senderId === +fId && +receiverId === +yId) || (senderId === +yId && +receiverId === +fId)){
+            let previousMessages = messages.map( message => message ) // clonando array
+            previousMessages.unshift(brandNewMessage)
+            setMessages(previousMessages)
+            if (brandNewMessage.sender === 'you')
+                setSendingMessage(false)
+        }
+
+        
+    }
+
     const handleMessageSubmit = (event: FormEvent) =>{
         event.preventDefault()
 
-        let previousMessages = messages.map( message => message ) // clonando array
         let newMessageDiv:any = document.getElementById('chatInput');
-
         if (newMessageDiv.value.trim().length === 0 )
             return false
-
-        const token = localStorage.getItem('accessToken')
 
         const data = {
             text: newMessageDiv.value,
             idReceiver: friend.id
         }
         newMessageDiv.value = ""
-        const reqConfig:RequestInit = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'authorization': token || ''
-            },
-            body: JSON.stringify(data)
-        }
-        socket.emit("newMessage", data.text, fId)
-/*
-        fetch(`${process.env.REACT_APP_BACKEND_IP}/newMessage`, reqConfig)
-        .then( res =>{
+        socket.emit('changeTypingStatus', fId, false)
+        typing = false;
+        socket.emit("newMessage", data.text, +fId)
 
-            if (res.status === 400){
-                alert('Erro de autenticação')
-                window.location.href = '/'
-            }
-            else if (res.status === 201){
-
-                const newMessage:MessageType = {
-                    id: new Date().getTime(),
-                    text: data.text,
-                    sender: "you"
-                }
-                previousMessages.unshift(newMessage)
-                setMessages(previousMessages)
-                setSendingMessage(false)
-
-            }
-
-        })
-        .catch( err =>{
-            console.log(err);
-            alert('Erro no servidor')
-            
-        })
-*/
         setSendingMessage(true)
 
     }
+
+    const handleInputChange = () =>{
+
+        const newMessageDiv:any = document.getElementById('chatInput');
+        const texto:String = newMessageDiv.value
+
+        if ( typing && texto.length === 0 ){
+            socket.emit('changeTypingStatus', fId, false)
+            typing = false;
+        }
+        else if( !typing && texto.length > 0 ){
+            socket.emit('changeTypingStatus', fId, true)
+            typing = true
+        }
+
+    }
+
+    const handleStatusChange = (status: string, userId:number) =>{
+        if (userId === +fId)
+            setFriend({
+                id: friend.id,
+                name: friend.name,
+                status
+            })
+    }
+
+    //socket listeners
+    socket.removeAllListeners("receivedMessage")
+    socket.removeAllListeners("friendStatusChange")
+    socket.on('receivedMessage', handleReceivedMessage)
+    socket.on('friendStatusChange', handleStatusChange)
 
     const token = localStorage.getItem('accessToken')
     if (!token)
@@ -112,15 +127,6 @@ function Chat(props:Props){
             'authorization': token || ''
         }
     }
-
-    socket.on('receivedMessage', (brandNewMessage: MessageType)=>{
-        let previousMessages = messages.map( message => message ) // clonando array
-        previousMessages.unshift(brandNewMessage)
-        setMessages(previousMessages)
-        if (brandNewMessage.sender === 'you')
-            setSendingMessage(false)
-    })
-
     if ( loadStatus === 'noRequest' ){
 
         setLoadStatus('processing')
@@ -141,11 +147,11 @@ function Chat(props:Props){
         .then( (jsonRes) =>{
             
             if (jsonRes){
-                const [name, messages] = jsonRes
+                const [name, status, messages] = jsonRes
                 setFriend({
                     id: friend.id,
-                    name: name,
-                    status: 'offline'
+                    name,
+                    status
                 })
                 setMessages(messages)
             }
@@ -213,6 +219,7 @@ function Chat(props:Props){
                     id="chatInput"
                     placeholder="Digite sua mensagem"
                     autoComplete="off"
+                    onChange={handleInputChange}
                 />
                 <button type="submit" className="chatSendButton"><FaPaperPlane className="me"></FaPaperPlane></button>
             </form>

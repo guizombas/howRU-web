@@ -23,8 +23,8 @@ const AuthRoute = ( params:any ) =>{
         if (!auth.ready){
             isAuthenticated()
             .then( (res:boolean|void|string) =>{
-                
-                if (res)
+                    
+                if (res && !socket)
                     setSocket( io('http://localhost:3300', { auth: {token: res} } ))
 
                 setAuth({
