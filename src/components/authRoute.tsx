@@ -2,6 +2,9 @@ import {useState} from 'react'
 import {Redirect, Route} from 'react-router-dom'
 import isAuthenticated from '../utils/auth'
 import {io, Socket} from 'socket.io-client'
+import Fail from './fail'
+
+import '../styles/global.css'
 
 interface Auth{
     ready: boolean,
@@ -23,15 +26,21 @@ const AuthRoute = ( params:any ) =>{
         if (!auth.ready){
             isAuthenticated()
             .then( (res:boolean|void|string) =>{
-                    
-                if (res && !socket)
+
+                if (res != undefined){
+
+                    if (res && !socket)
                     setSocket( io('http://localhost:3300', { auth: {token: res} } ))
 
-                setAuth({
-                    ready: true,
-                    res: res !== false,
-                    userId: res || ''
-                })
+                    setAuth({
+                        ready: true,
+                        res: res !== false,
+                        userId: res || ''
+                    })
+
+                }
+                    
+                
 
             }) 
             .catch( err => console.log(err) )
@@ -45,20 +54,28 @@ const AuthRoute = ( params:any ) =>{
         
         ( auth.res === needAuth )
         ?
-        <Component {...props} userId={auth.userId.toString()} socket={socket}/>
+        <div className="authDiv">
+            <Component {...props} userId={auth.userId.toString()} socket={socket}/>
+            
+        </div>
+        
         :
         <Redirect  to={ needAuth ? '/' : '/menu' }/>
         
         :
 
-        <svg className='loading' height='100%' width='100%'>
-            <circle
-                className='path' 
-                cx='50%' cy='50%' r='25' 
-                stroke='#07354b' strokeWidth='3' 
-                fill='transparent'
-            ></circle>
-        </svg>
+        <div className="authDiv">
+            <svg className='loading' height='100%' width='100%'>
+                <circle
+                    className='path' 
+                    cx='50%' cy='50%' r='25' 
+                    stroke='#07354b' strokeWidth='3' 
+                    fill='transparent'
+                ></circle>
+            </svg>
+            <Fail></Fail>
+        </div>
+        
         
         )
         

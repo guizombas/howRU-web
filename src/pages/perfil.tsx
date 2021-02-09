@@ -55,14 +55,17 @@ function Perfil( props:any ){
         .then( res =>{
 
             if (res.status === 400){
-                alert('Erro de autenticação')
                 return window.location.href = '/'
             }
 
         })
         .catch( err =>{
             console.log(err);
-            alert('Erro no servidor')
+            const div = document.querySelector('#fail')
+            if (div){
+                div.classList.remove('hide')
+                div.classList.add('show')
+            }
             
         })
 
@@ -97,14 +100,17 @@ function Perfil( props:any ){
         .then( res =>{
 
             if (res.status === 400){
-                alert('Erro de autenticação')
                 return window.location.href = '/'
             }
 
         })
         .catch( err =>{
             console.log(err);
-            alert('Erro no servidor')
+            const div = document.querySelector('#fail')
+            if (div){
+                div.classList.remove('hide')
+                div.classList.add('show')
+            }
             
         })
 
@@ -132,7 +138,6 @@ function Perfil( props:any ){
         .then( res =>{
 
             if (res.status === 400){
-                alert('Erro de autenticação')
                 return window.location.href = '/'
             }
             if (res.status === 404)
@@ -153,7 +158,11 @@ function Perfil( props:any ){
         })
         .catch( err =>{
             console.log(err);
-            alert('Erro no servidor')
+            const div = document.querySelector('#fail')
+            if (div){
+                div.classList.remove('hide')
+                div.classList.add('show')
+            }
         })
 
     }

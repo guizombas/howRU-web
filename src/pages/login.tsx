@@ -66,7 +66,11 @@ const Login = () => {
         } )
         .catch( err =>{
             console.log(err);
-            alert('Erro no servidor')
+            const div = document.querySelector('#fail')
+            if (div){
+                div.classList.remove('hide')
+                div.classList.add('show')
+            }
             
         })
     }

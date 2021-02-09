@@ -66,7 +66,6 @@ const Menu = (props:any) =>{
         .then( res =>{
 
             if (res.status === 400){
-                alert('Erro de autenticação')
                 return window.location.href = '/'
             }
             
@@ -92,7 +91,11 @@ const Menu = (props:any) =>{
         })
         .catch( err =>{
             console.log(err);
-            alert('Erro no servidor')
+            const div = document.querySelector('#fail')
+            if (div){
+                div.classList.remove('hide')
+                div.classList.add('show')
+            }
         })
 
     }
@@ -109,7 +112,6 @@ const Menu = (props:any) =>{
             
 
             if (res.status === 400){
-                alert('Erro de autenticação')
                 return window.location.href = '/'
             }
             
@@ -133,7 +135,11 @@ const Menu = (props:any) =>{
         })
         .catch( err =>{
             console.log(err);
-            alert('Erro no servidor')
+            const div = document.querySelector('#fail')
+            if (div){
+                div.classList.remove('hide')
+                div.classList.add('show')
+            }
         })
 
 

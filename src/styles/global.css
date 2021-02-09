@@ -25,6 +25,12 @@ body{
     justify-content: center;
     align-items: center;
 }
+.authDiv{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 ::-webkit-scrollbar{
     width: 4px;

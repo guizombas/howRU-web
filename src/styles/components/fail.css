@@ -1,0 +1,44 @@
+#fail{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+#fail.show{
+    opacity: 0.9;
+    display: block;
+    transition: opacity 0.2s ease-in;
+}
+#fail.hide{
+    opacity: 0;
+    top: -100px;
+    transition: opacity 0.2s ease-out, top 0.001s 0.3s;
+}
+.failModal{
+    position: relative;
+
+    border-radius: 25px;
+    border-top-right-radius: 0;
+    padding: 20px;
+    
+    background-color: rgb(223, 0, 0);
+    color: black;
+}
+
+.failModal .closeModal{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    cursor: pointer;
+}
+.failModal p{
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline;
+}
+
+@media screen and (max-width: 500px){
+    .failModal h1{
+        font-size: 25px;
+    }
+}
