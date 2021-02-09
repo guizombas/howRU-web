@@ -5,6 +5,7 @@ import {io, Socket} from 'socket.io-client'
 import Fail from './fail'
 
 import '../styles/global.css'
+import Notification from './notification'
 
 interface Auth{
     ready: boolean,
@@ -21,16 +22,28 @@ const AuthRoute = ( params:any ) =>{
         userId: ''
     })
     const [ socket, setSocket ] = useState<undefined|Socket>()
+    const [ notificationMessage, setnotificaionMessage ] = useState(0)
+    
 
     return <Route {...rest}  render={ (props:any)=>{
         if (!auth.ready){
             isAuthenticated()
             .then( (res:boolean|void|string) =>{
 
-                if (res != undefined){
+                if (res !== undefined){
 
-                    if (res && !socket)
-                    setSocket( io('http://localhost:3300', { auth: {token: res} } ))
+                    if (res && !socket){
+                        const skt = io('http://localhost:3300', { auth: {token: res} } )
+                        setSocket(skt)
+                        skt.on('notificate', (senderId:number) =>{
+                            
+                            setnotificaionMessage(senderId)
+                            setTimeout(()=>{
+                                setnotificaionMessage(0)
+                            }, 5000)
+                        })
+
+                    }
 
                     setAuth({
                         ready: true,
@@ -56,6 +69,12 @@ const AuthRoute = ( params:any ) =>{
         ?
         <div className="authDiv">
             <Component {...props} userId={auth.userId.toString()} socket={socket}/>
+            <Fail></Fail>
+            {
+                needAuth && (notificationMessage!==0 || notificationMessage) ?
+                <Notification senderId={notificationMessage} onClick={()=>{ setnotificaionMessage(0) }}></Notification>
+                :""
+            }
             
         </div>
         

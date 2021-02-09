@@ -7,6 +7,7 @@ import { FaLongArrowAltLeft, FaPaperPlane } from 'react-icons/fa'
 import Message from '../components/message'
 
 import '../styles/pages/chat.css'
+import Notification from '../components/notification'
 
 interface SocketType extends Socket{
     removeAllListeners: Function
