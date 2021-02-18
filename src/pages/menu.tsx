@@ -107,7 +107,7 @@ const Menu = (props:any) =>{
             friends: 'processing'
         })
         
-        fetch( 'http://localhost:3300/allFriends', reqConfig )
+        fetch(  process.env.REACT_APP_BACKEND_IP+ '/allFriends', reqConfig )
         .then( res =>{
             
 

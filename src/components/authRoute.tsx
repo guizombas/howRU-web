@@ -33,7 +33,7 @@ const AuthRoute = ( params:any ) =>{
                 if (res !== undefined){
 
                     if (res && !socket){
-                        const skt = io('http://localhost:3300', { auth: {token: res} } )
+                        const skt = io( 'http://192.168.0.108:3300', { auth: {token: res} } )
                         setSocket(skt)
                         skt.on('notificate', (senderId:number) =>{
                             
