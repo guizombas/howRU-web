@@ -117,6 +117,11 @@
     box-shadow: 3px 3px 5px var(--sLighterColor);
 }
 
+#chatPage .sending{
+    width: 100%;
+    text-align: center;
+}
+
 /*placeholder*/
 #chatPage ::-webkit-input-placeholder {
     color: var(--sLighterColor);

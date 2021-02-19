@@ -196,7 +196,7 @@ function Chat(props:Props){
                 {
                 sendingMessage
                 ?
-                <div>Enviando</div>
+                <div className='sending'>Enviando...</div>
                 :
                 ''
                 }
