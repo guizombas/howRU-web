@@ -19,7 +19,7 @@ function Routes(){
                 <AuthRoute path="/cadastro" component={register} needAuth={false}></AuthRoute>
                 <AuthRoute path="/menu" component={menu} needAuth={true}></AuthRoute>
                 <AuthRoute path="/perfil/:id" component={perfil} needAuth={true}></AuthRoute>
-                <AuthRoute path="/chat/:fid" component={chat} needAuth={true}></AuthRoute>
+                <AuthRoute path="/chat/:fid" component={chat} needAuth={true} blockNotifications></AuthRoute>
                 <AuthRoute path="/encontrar" component={find} needAuth={true}></AuthRoute>
                 <Route path='/' component={NotFound}></Route>
             </Switch>

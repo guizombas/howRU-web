@@ -1,4 +1,4 @@
-import {FormEvent, useState} from 'react'
+import {FormEvent, useEffect, useState} from 'react'
 import {Link, useHistory, useParams} from 'react-router-dom'
 import {Socket} from 'socket.io-client'
 
@@ -49,6 +49,21 @@ function Chat(props:Props){
     })
     const [loadStatus, setLoadStatus] = useState('noRequest')
     const [sendingMessage, setSendingMessage] = useState(false)
+
+    //effects
+    useEffect(()=>{
+        //socket listeners
+        socket.on('receivedMessage', handleReceivedMessage)
+        socket.on('friendStatusChange', handleStatusChange)
+        return function cleanup(){
+            //evitar memory leak
+            socket.removeAllListeners("receivedMessage")
+            socket.removeAllListeners("friendStatusChange")
+        }
+    })
+    useEffect ( () =>{
+        setLoadStatus('noRequest')
+    }, [params])
 
     //handlers
     const handleReceivedMessage = (brandNewMessage: MessageType, senderId:number, receiverId:number) =>{
@@ -110,11 +125,7 @@ function Chat(props:Props){
             })
     }
 
-    //socket listeners
-    socket.removeAllListeners("receivedMessage")
-    socket.removeAllListeners("friendStatusChange")
-    socket.on('receivedMessage', handleReceivedMessage)
-    socket.on('friendStatusChange', handleStatusChange)
+    
 
     const token = localStorage.getItem('accessToken')
     if (!token)

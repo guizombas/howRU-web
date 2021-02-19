@@ -1,4 +1,4 @@
-import {ChangeEvent, useState} from 'react'
+import {ChangeEvent, useEffect, useState} from 'react'
 import {Link} from 'react-router-dom'
 
 import {FaPlus, FaUserCircle, FaSignOutAlt} from 'react-icons/fa'
@@ -18,6 +18,11 @@ interface Friend {
     name: String,
     id: number
 }
+interface MessageType{
+    id: number,
+    text: string,
+    sender: string
+}
 interface Status{
     chats: 'noRequest' | 'processing' | 'done',
     friends: 'noRequest' | 'processing' | 'done'
@@ -25,14 +30,18 @@ interface Status{
 
 const Menu = (props:any) =>{
 
+    //states
     const [tab, setTab] = useState(0)
     const [loadStatus, setLoadStatus] = useState<Status>({
         chats: 'noRequest',
         friends: 'noRequest'
     })
-    const [chats, setChats] = useState([])
+    const [chats, setChats] = useState<Array<Chat>>([])
     const [friends, setFriends] = useState([])
 
+    
+
+    //handlers
     const handleRadioTabChange = (event: ChangeEvent<HTMLInputElement>) =>{
         setTab(parseInt(event.target.value))
     }
@@ -40,6 +49,46 @@ const Menu = (props:any) =>{
         localStorage.clear()
         window.location.href = '/'
     }
+    const handleReceivedMessage = (brandNewMessage: MessageType, senderId:number, receiverId:number) =>{
+        
+        let senderIndex
+        console.log(chats);
+        
+        const updateChats = chats.filter( (chat:Chat, index)=>{
+            console.log(index);
+            
+            const isNotTheSender = chat.friendID !== senderId
+            if (!isNotTheSender){
+                senderIndex = index
+            }
+
+            return isNotTheSender
+        })
+        
+        const newChat:Chat = {
+            friendID: senderId,
+            lastMessage: brandNewMessage.text,
+            lastSender: 'friend',
+            name:  senderIndex!==undefined ? chats[senderIndex].name : "-> Nova Conversa <-" 
+        }
+        console.log(newChat);
+        
+        updateChats.unshift(newChat)
+        setChats(updateChats)
+    }
+
+    //effects
+    const socket = props.socket
+    useEffect(()=>{
+        //socket listeners
+        socket.on('receivedMessage', handleReceivedMessage)
+        
+        return function cleanup(){
+            //evitar memory leak
+            socket.removeAllListeners("receivedMessage")
+            
+        }
+    })
 
     const yourID = props.userId 
     const token = localStorage.getItem('accessToken')

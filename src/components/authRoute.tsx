@@ -15,7 +15,7 @@ interface Auth{
 
 const AuthRoute = ( params:any ) =>{
 
-    const {component: Component, needAuth , ...rest} = params
+    const {component: Component, needAuth , blockNotifications, ...rest} = params
     const [ auth, setAuth ] = useState<Auth>({
         ready: false,
         res: false,
@@ -33,14 +33,19 @@ const AuthRoute = ( params:any ) =>{
                 if (res !== undefined){
 
                     if (res && !socket){
+                        
                         const skt = io( 'http://192.168.0.108:3300', { auth: {token: res} } )
                         setSocket(skt)
                         skt.on('notificate', (senderId:number) =>{
+
+                            const pathname = window.location.pathname.split('/')
+                            if ( !(pathname[1] === 'chat' && pathname[2] === `${senderId}`) ){
+                                setnotificaionMessage(senderId)
+                                setTimeout(()=>{
+                                    setnotificaionMessage(0)
+                                }, 5000)
+                            }
                             
-                            setnotificaionMessage(senderId)
-                            setTimeout(()=>{
-                                setnotificaionMessage(0)
-                            }, 5000)
                         })
 
                     }
@@ -70,8 +75,8 @@ const AuthRoute = ( params:any ) =>{
         <div className="authDiv">
             <Component {...props} userId={auth.userId.toString()} socket={socket}/>
             <Fail></Fail>
-            {
-                needAuth && (notificationMessage!==0 || notificationMessage) ?
+            { 
+                needAuth && (notificationMessage!==0 || notificationMessage)/* && !blockNotifications*/ ?
                 <Notification senderId={notificationMessage} onClick={()=>{ setnotificaionMessage(0) }}></Notification>
                 :""
             }
