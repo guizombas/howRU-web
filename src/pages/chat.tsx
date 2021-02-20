@@ -50,22 +50,7 @@ function Chat(props:Props){
     const [loadStatus, setLoadStatus] = useState('noRequest')
     const [sendingMessage, setSendingMessage] = useState(false)
 
-    //effects
-    useEffect(()=>{
-        //socket listeners
-        socket.on('receivedMessage', handleReceivedMessage)
-        socket.on('friendStatusChange', handleStatusChange)
-        return function cleanup(){
-            //evitar memory leak
-            socket.removeAllListeners("receivedMessage")
-            socket.removeAllListeners("friendStatusChange")
-        }
-    })
-    useEffect ( () =>{
-        setLoadStatus('noRequest')
-    }, [params])
-
-    //handlers
+    //handlers e funções
     const handleReceivedMessage = (brandNewMessage: MessageType, senderId:number, receiverId:number) =>{
 
         //conferindo se a mensagem deve ir para esse chat
@@ -125,24 +110,8 @@ function Chat(props:Props){
             })
     }
 
-    
-
-    const token = localStorage.getItem('accessToken')
-    if (!token)
-        window.location.href = '/'
-
-    const reqConfig:RequestInit = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'authorization': token || ''
-        }
-    }
-    if ( loadStatus === 'noRequest' ){
-
-        setLoadStatus('processing')
-        
-        fetch( process.env.REACT_APP_BACKEND_IP+'/allMessages/'+fId, reqConfig )
+    const requireMessages = (time: number, reqConfig: RequestInit, currentMessages: Array<MessageType>) =>{
+        fetch( process.env.REACT_APP_BACKEND_IP+'/allMessages/'+fId+'/'+time, reqConfig )
         .then( res =>{
 
             if (res.status === 400){
@@ -150,23 +119,31 @@ function Chat(props:Props){
             }
             else if (res.status === 404)
                 window.location.href = '/404'
-            else
+            else{
+                
                 return res.json()
+            }
             
         })
         .then( (jsonRes) =>{
             
             if (jsonRes){
-                const [name, status, messages] = jsonRes
+                const [name, status, isFinished, resMessages] = jsonRes
                 setFriend({
                     id: friend.id,
                     name,
                     status
                 })
-                setMessages(messages)
+                resMessages.forEach( (message:MessageType) =>{ currentMessages.push(message) })
+                setMessages(currentMessages)
+
+                
+
+                if (isFinished)
+                    setLoadStatus('done')
+                else
+                    requireMessages(time+1,reqConfig, currentMessages)
             }
-           
-            setLoadStatus('done')
             
         })
         .catch( err =>{
@@ -177,8 +154,45 @@ function Chat(props:Props){
                 div.classList.add('show')
             }
         })
-
     }
+
+    //effects
+    useEffect( ()=>{
+        //socket listeners
+        socket.on('receivedMessage', handleReceivedMessage)
+        socket.on('friendStatusChange', handleStatusChange)
+        return function cleanup(){
+            //evitar memory leak
+            socket.removeAllListeners("receivedMessage")
+            socket.removeAllListeners("friendStatusChange")
+        }
+    })
+    useEffect( ()=>{
+        setLoadStatus('noRequest')
+    }, [params])
+    useEffect( ()=>{
+        
+        if (loadStatus === 'noRequest'){
+
+            const token = localStorage.getItem('accessToken')
+            if (!token)
+                window.location.href = '/'
+
+            const reqConfig:RequestInit = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': token || ''
+                }
+            }
+            
+            requireMessages(0,reqConfig,[])
+
+            setLoadStatus('processing')
+            
+        }
+        
+    },[messages, loadStatus, requireMessages])
 
     return(
         <div id="chatPage">
@@ -202,6 +216,18 @@ function Chat(props:Props){
                 }
 
                 {
+                    messages.map( message =>{
+                        return(
+                            <Message
+                                key={message.id}
+                                sender={message.sender}
+                                text={message.text}
+                            ></Message>
+                        )
+                    } )
+                }
+
+                {
                 loadStatus !== 'done'
                 ?
                 <svg className='loading' height='100%' width='100%'>
@@ -213,15 +239,8 @@ function Chat(props:Props){
                     ></circle>
                 </svg>
                 :
-                    messages.map( message =>{
-                        return(
-                            <Message
-                                key={message.id}
-                                sender={message.sender}
-                                text={message.text}
-                            ></Message>
-                        )
-                    } )
+                ""
+                    
                 }
 
             </div>

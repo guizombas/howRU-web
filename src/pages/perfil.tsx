@@ -230,6 +230,7 @@ function Perfil( props:any ){
                                 type="text"
                                 defaultValue={ `${name}`}
                                 autoComplete="off"
+                                maxLength={50}
                                 required
                             />
                         </fieldset>
@@ -241,6 +242,7 @@ function Perfil( props:any ){
                                 type="text"
                                 defaultValue={`${tel}`}
                                 autoComplete="off" 
+                                maxLength={22}
                             />
                         </fieldset>
                         <div className="buttons">

@@ -52,10 +52,8 @@ const Menu = (props:any) =>{
     const handleReceivedMessage = (brandNewMessage: MessageType, senderId:number, receiverId:number) =>{
         
         let senderIndex
-        console.log(chats);
         
         const updateChats = chats.filter( (chat:Chat, index)=>{
-            console.log(index);
             
             const isNotTheSender = chat.friendID !== senderId
             if (!isNotTheSender){
@@ -71,7 +69,6 @@ const Menu = (props:any) =>{
             lastSender: 'friend',
             name:  senderIndex!==undefined ? chats[senderIndex].name : "-> Nova Conversa <-" 
         }
-        console.log(newChat);
         
         updateChats.unshift(newChat)
         setChats(updateChats)
@@ -113,7 +110,7 @@ const Menu = (props:any) =>{
         
         fetch( process.env.REACT_APP_BACKEND_IP+'/allChats', reqConfig )
         .then( res =>{
-
+            
             if (res.status === 400){
                 return window.location.href = '/'
             }
