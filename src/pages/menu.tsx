@@ -41,7 +41,7 @@ const Menu = (props:any) =>{
 
     
 
-    //handlers
+    //handlers e funções
     const handleRadioTabChange = (event: ChangeEvent<HTMLInputElement>) =>{
         setTab(parseInt(event.target.value))
     }
@@ -73,6 +73,7 @@ const Menu = (props:any) =>{
         updateChats.unshift(newChat)
         setChats(updateChats)
     }
+    
 
     //effects
     const socket = props.socket
@@ -86,6 +87,72 @@ const Menu = (props:any) =>{
             
         }
     })
+    useEffect( ()=>{
+
+        const requireChats = ( time: number, reqConfig: RequestInit, currentChats: Array<Chat> ) =>{
+            fetch( process.env.REACT_APP_BACKEND_IP+'/allChats/'+time, reqConfig )
+            .then( res =>{
+                
+                if (res.status === 400){
+                    return window.location.href = '/'
+                }
+                
+                return res.json()
+                
+            })
+            .then( jsonRes =>{
+    
+                if (jsonRes){
+                    
+                    const [resChats, isFinished] = jsonRes
+                    resChats.forEach( (chat: Chat) =>{ currentChats.push(chat) })
+                    setChats(currentChats)
+    
+                    if (isFinished)
+                        setLoadStatus({
+                            chats: 'done',
+                            friends: loadStatus.friends
+                        })
+    
+                    else
+                        requireChats(time+1,reqConfig, currentChats)
+                }
+                
+            })
+            .catch( err =>{
+                console.log(err);
+                const div = document.querySelector('#fail')
+                if (div){
+                    div.classList.remove('hide')
+                    div.classList.add('show')
+                }
+            })
+        }
+        
+        if (loadStatus.chats === 'noRequest'){
+
+            const token = localStorage.getItem('accessToken')
+            if (!token)
+                window.location.href = '/'
+
+            const reqConfig:RequestInit = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': token || ''
+                }
+            }
+            
+            requireChats(0,reqConfig,[])
+
+            setLoadStatus({
+                friends: loadStatus.friends,
+                chats: 'processing'
+            })
+            
+        }
+        
+    },[chats, loadStatus])
 
     const yourID = props.userId 
     const token = localStorage.getItem('accessToken')
@@ -99,51 +166,6 @@ const Menu = (props:any) =>{
             'Content-Type': 'application/json',
             'authorization': token || ''
         }
-    }
-
-    if ( loadStatus.chats === 'noRequest' ){
-
-        setLoadStatus({
-            chats: 'processing',
-            friends: loadStatus.friends
-        })
-        
-        fetch( process.env.REACT_APP_BACKEND_IP+'/allChats', reqConfig )
-        .then( res =>{
-            
-            if (res.status === 400){
-                return window.location.href = '/'
-            }
-            
-            return res.json()
-            
-        })
-        .then( jsonRes =>{
-            
-            setChats(jsonRes.map( (chat:Chat) =>{
-                return{
-                    friendID: chat.friendID,
-                    lastMessage: chat.lastMessage,
-                    lastSender: chat.lastSender,
-                    name: chat.name
-                }
-            }))
-
-            setLoadStatus({
-                chats: 'done',
-                friends: loadStatus.friends
-            })
-            
-        })
-        .catch( err =>{
-            console.log(err);
-            const div = document.querySelector('#fail')
-            if (div){
-                div.classList.remove('hide')
-                div.classList.add('show')
-            }
-        })
-
     }
 
     if ( loadStatus.friends === 'noRequest' ){
@@ -188,10 +210,7 @@ const Menu = (props:any) =>{
             }
         })
 
-
     }
-
-
 
 
     return (
@@ -232,21 +251,10 @@ const Menu = (props:any) =>{
                 <div id="chatsDiv">
 
                     {
-
-                        loadStatus.chats !== 'done'
+                        loadStatus.chats === 'done' && chats.length===0
                         ?
-                        <svg className='loading' height='100%' width='100%'>
-                            <circle
-                                className='path' 
-                                cx='50%' cy='50%' r='25' 
-                                stroke='#07354b' strokeWidth='3' 
-                                fill='transparent'
-                            ></circle>
-                        </svg>
+                        <div className="noChats">Você ainda não tem nenhuma conversa</div>
                         :
-
-                        chats.length>0
-                        ?
                         chats.map( (chat:Chat) =>{
                             return (
                                 <Link 
@@ -266,13 +274,23 @@ const Menu = (props:any) =>{
                             )
                         } )
                         
-                        :
-                        <div className="noChats">Você ainda não tem nenhuma conversa</div>
-
-                        
-
                     }
-                    
+
+                    {
+
+                    loadStatus.chats !== 'done'
+                    ?
+                    <svg className='loading' height='100%' width='100%'>
+                        <circle
+                            className='path' 
+                            cx='50%' cy='50%' r='25' 
+                            stroke='#07354b' strokeWidth='3' 
+                            fill='transparent'
+                        ></circle>
+                    </svg>
+                    :
+                    ""
+                    }
                     
                 </div>
                 :

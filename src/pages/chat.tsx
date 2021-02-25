@@ -29,6 +29,8 @@ interface Props{
     socket: SocketType
 }
 
+
+
 let typing = false
 
 function Chat(props:Props){
@@ -110,52 +112,6 @@ function Chat(props:Props){
             })
     }
 
-    const requireMessages = (time: number, reqConfig: RequestInit, currentMessages: Array<MessageType>) =>{
-        fetch( process.env.REACT_APP_BACKEND_IP+'/allMessages/'+fId+'/'+time, reqConfig )
-        .then( res =>{
-
-            if (res.status === 400){
-                window.location.href = '/'
-            }
-            else if (res.status === 404)
-                window.location.href = '/404'
-            else{
-                
-                return res.json()
-            }
-            
-        })
-        .then( (jsonRes) =>{
-            
-            if (jsonRes){
-                const [name, status, isFinished, resMessages] = jsonRes
-                setFriend({
-                    id: friend.id,
-                    name,
-                    status
-                })
-                resMessages.forEach( (message:MessageType) =>{ currentMessages.push(message) })
-                setMessages(currentMessages)
-
-                
-
-                if (isFinished)
-                    setLoadStatus('done')
-                else
-                    requireMessages(time+1,reqConfig, currentMessages)
-            }
-            
-        })
-        .catch( err =>{
-            console.log(err);
-            const div = document.querySelector('#fail')
-            if (div){
-                div.classList.remove('hide')
-                div.classList.add('show')
-            }
-        })
-    }
-
     //effects
     useEffect( ()=>{
         //socket listeners
@@ -173,6 +129,50 @@ function Chat(props:Props){
     useEffect( ()=>{
         
         if (loadStatus === 'noRequest'){
+            
+            const requireMessages = (time: number, reqConfig: RequestInit, currentMessages: Array<MessageType>) =>{
+                fetch( process.env.REACT_APP_BACKEND_IP+'/allMessages/'+fId+'/'+time, reqConfig )
+                .then( res =>{
+        
+                    if (res.status === 400){
+                        window.location.href = '/'
+                    }
+                    else if (res.status === 404)
+                        window.location.href = '/404'
+                    else{
+                        
+                        return res.json()
+                    }
+                    
+                })
+                .then( (jsonRes) =>{
+                    
+                    if (jsonRes){
+                        const [name, status, isFinished, resMessages] = jsonRes
+                        setFriend({
+                            id: friend.id,
+                            name,
+                            status
+                        })
+                        resMessages.forEach( (message:MessageType) =>{ currentMessages.push(message) })
+                        setMessages(currentMessages)
+        
+                        if (isFinished)
+                            setLoadStatus('done')
+                        else
+                            requireMessages(time+1,reqConfig, currentMessages)
+                    }
+                    
+                })
+                .catch( err =>{
+                    console.log(err);
+                    const div = document.querySelector('#fail')
+                    if (div){
+                        div.classList.remove('hide')
+                        div.classList.add('show')
+                    }
+                })
+            }
 
             const token = localStorage.getItem('accessToken')
             if (!token)
@@ -192,7 +192,7 @@ function Chat(props:Props){
             
         }
         
-    },[messages, loadStatus, requireMessages])
+    },[messages, loadStatus, fId, friend.id])
 
     return(
         <div id="chatPage">
