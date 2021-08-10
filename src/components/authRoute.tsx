@@ -34,7 +34,7 @@ const AuthRoute = ( params:any ) =>{
 
                     if (res && !socket){
                         
-                        const skt = io( process.env.REACT_APP_BACKEND_IP, { auth: {token: res} } )
+                        const skt = io( process.env.REACT_APP_BACKEND_IP || 'http://192.168.0.108:3300', { auth: {token: res} } )
                         setSocket(skt)
                         skt.on('notificate', (senderId:number) =>{
 
